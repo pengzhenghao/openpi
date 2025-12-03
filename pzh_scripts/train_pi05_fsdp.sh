@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name="pi05_libero_fsdp_%j_%t"
-#SBATCH --output="pi05_libero_fsdp_%j_%t.out"
+#SBATCH --job-name="pi05_libero_fsdp"
+#SBATCH --output="%j_pi05_libero_fsdp.out"
 #SBATCH --gres=gpu:8
 #SBATCH --ntasks-per-node=8
 #SBATCH --time=7-00:00:00
-#SBATCH --partition="gpu08"
+#SBATCH --partition="gpu09"
 
 # Note: no need to activate conda env
 
