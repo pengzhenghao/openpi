@@ -17,5 +17,5 @@ export PYTHONUNBUFFERED=1
 export XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
 
 # Run the training command with FSDP enabled (8 devices)
-uv run scripts/train.py pi05_libero --exp-name="1202_debug_fsdp_$(date +%Y%m%d_%H%M%S)" --overwrite --fsdp-devices=8
+uv run scripts/train.py pi05_libero --exp-name="1202_debug_fsdp_$(date +%Y%m%d_%H%M%S)" --overwrite --fsdp-devices=8 --log-interval=1
 

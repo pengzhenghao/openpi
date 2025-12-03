@@ -33,6 +33,13 @@ download.maybe_download("gs://openpi-assets/checkpoints/pi05_droid")
 
 ```
 
+
+lora finetuning?:
+
+* https://github.com/Physical-Intelligence/openpi/issues/672
+
+
+
 # openpi
 
 openpi holds open-source models and packages for robotics, published by the [Physical Intelligence team](https://www.physicalintelligence.company/).
