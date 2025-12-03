@@ -11,6 +11,26 @@ uv run scripts/compute_norm_stats.py --config-name pi05_libero
 XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_libero --exp-name=1202_debug --overwrite
 
 
+
+```
+
+Download models:
+
+```python
+
+from openpi.shared import download
+
+download.maybe_download("gs://openpi-assets/checkpoints/pi0_droid")
+download.maybe_download("gs://openpi-assets/checkpoints/pi05_libero")
+download.maybe_download("gs://openpi-assets/checkpoints/pi0_fast_droid")
+download.maybe_download("gs://openpi-assets/checkpoints/pi0_aloha_towel")
+download.maybe_download("gs://openpi-assets/checkpoints/pi0_aloha_tupperware")
+download.maybe_download("gs://openpi-assets/checkpoints/pi0_aloha_pen_uncap")
+download.maybe_download("gs://openpi-assets/checkpoints/pi0_droid")
+download.maybe_download("gs://openpi-assets/checkpoints/pi05_droid")
+
+
+
 ```
 
 # openpi
@@ -60,6 +80,13 @@ git submodule update --init --recursive
 We use [uv](https://docs.astral.sh/uv/) to manage Python dependencies. See the [uv installation instructions](https://docs.astral.sh/uv/getting-started/installation/) to set it up. Once uv is installed, run the following to set up the environment:
 
 ```bash
+
+conda create -n openpi python=3.12 -y
+
+conda activate openpi
+
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
 GIT_LFS_SKIP_SMUDGE=1 uv sync
 GIT_LFS_SKIP_SMUDGE=1 uv pip install -e .
 ```
