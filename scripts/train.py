@@ -188,6 +188,9 @@ def train_step(
         "grad_norm": optax.global_norm(grads),
         "param_norm": optax.global_norm(kernel_params),
     }
+
+    print(f"Step {state.step}: {info}")
+
     return new_state, info
 
 
