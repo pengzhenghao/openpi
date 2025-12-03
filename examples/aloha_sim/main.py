@@ -1,6 +1,7 @@
 import dataclasses
 import logging
 import pathlib
+import sys
 
 import env as _env
 from openpi_client import action_chunk_broker
@@ -8,7 +9,24 @@ from openpi_client import websocket_client_policy as _websocket_client_policy
 from openpi_client.runtime import runtime as _runtime
 from openpi_client.runtime.agents import policy_agent as _policy_agent
 import saver as _saver
+from tqdm import tqdm
 import tyro
+
+# Detect if we're in a server/Docker environment (no TTY)
+tqdm_is_server = not sys.stderr.isatty()
+
+# Custom tqdm class that prints progress bars in Docker/non-TTY environments
+class ServerTqdm(tqdm):
+    def update(self, n=1):
+        result = super().update(n)
+        if result and tqdm_is_server:
+            print(f"{self}\n", flush=True)
+        return result
+
+    def display(self, msg=None, pos=None):
+        if not tqdm_is_server:
+            return super().display(msg, pos)
+        return True
 
 
 @dataclasses.dataclass

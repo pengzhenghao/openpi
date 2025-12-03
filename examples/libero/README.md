@@ -1,3 +1,14 @@
+# PZH Note:
+
+
+```bash
+
+CLIENT_ARGS="--args.num-trials-per-task 10 --args.task-suite-name libero_10" MUJOCO_GL=glx SERVER_A
+RGS="--env LIBERO" docker compose -f examples/libero/compose.yml up --build
+
+```
+
+
 # LIBERO Benchmark
 
 This example runs the LIBERO benchmark: https://github.com/Lifelong-Robot-Learning/LIBERO

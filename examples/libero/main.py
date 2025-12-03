@@ -3,6 +3,7 @@ import dataclasses
 import logging
 import math
 import pathlib
+import sys
 
 import imageio
 from libero.libero import benchmark
@@ -11,11 +12,27 @@ from libero.libero.envs import OffScreenRenderEnv
 import numpy as np
 from openpi_client import image_tools
 from openpi_client import websocket_client_policy as _websocket_client_policy
-import tqdm
+from tqdm import tqdm
 import tyro
 
 LIBERO_DUMMY_ACTION = [0.0] * 6 + [-1.0]
 LIBERO_ENV_RESOLUTION = 256  # resolution used to render training data
+
+# Detect if we're in a server/Docker environment (no TTY)
+tqdm_is_server = not sys.stderr.isatty()
+
+# Custom tqdm class that prints progress bars in Docker/non-TTY environments
+class ServerTqdm(tqdm):
+    def update(self, n=1):
+        result = super().update(n)
+        if result and tqdm_is_server:
+            print(f"{self}\n", flush=True)
+        return result
+
+    def display(self, msg=None, pos=None):
+        if not tqdm_is_server:
+            return super().display(msg, pos)
+        return True
 
 
 @dataclasses.dataclass
@@ -74,7 +91,11 @@ def eval_libero(args: Args) -> None:
 
     # Start evaluation
     total_episodes, total_successes = 0, 0
-    for task_id in tqdm.tqdm(range(num_tasks_in_suite)):
+    task_progress = ServerTqdm(range(num_tasks_in_suite), desc="Tasks", disable=False)
+    for task_id in task_progress:
+        task_progress.set_description(f"Task {task_id+1}/{num_tasks_in_suite}")
+        if tqdm_is_server:
+            print(f"{task_progress}\n", flush=True)
         # Get task
         task = task_suite.get_task(task_id)
 
@@ -83,11 +104,22 @@ def eval_libero(args: Args) -> None:
 
         # Initialize LIBERO environment and task description
         env, task_description = _get_libero_env(task, LIBERO_ENV_RESOLUTION, args.seed)
+        logging.info(f"Task: {task_description}")
 
         # Start episodes
         task_episodes, task_successes = 0, 0
-        for episode_idx in tqdm.tqdm(range(args.num_trials_per_task)):
-            logging.info(f"\nTask: {task_description}")
+        episode_progress = ServerTqdm(
+            range(args.num_trials_per_task),
+            desc=f"Task {task_id+1}/{num_tasks_in_suite} Episodes",
+            disable=False,
+            leave=False,
+        )
+        for episode_idx in episode_progress:
+            episode_progress.set_description(
+                f"Task {task_id+1}/{num_tasks_in_suite} Episode {episode_idx+1}/{args.num_trials_per_task}"
+            )
+            if tqdm_is_server:
+                print(f"{episode_progress}\n", flush=True)
 
             # Reset environment
             env.reset()
@@ -100,7 +132,6 @@ def eval_libero(args: Args) -> None:
             t = 0
             replay_images = []
 
-            logging.info(f"Starting episode {task_episodes+1}...")
             while t < max_steps + args.num_steps_wait:
                 try:
                     # IMPORTANT: Do nothing for the first few timesteps because the simulator drops objects
@@ -177,6 +208,10 @@ def eval_libero(args: Args) -> None:
             logging.info(f"Success: {done}")
             logging.info(f"# episodes completed so far: {total_episodes}")
             logging.info(f"# successes: {total_successes} ({total_successes / total_episodes * 100:.1f}%)")
+            
+            # Update progress bar to show completion
+            if tqdm_is_server:
+                print(f"{episode_progress}\n", flush=True)
 
         # Log final results
         logging.info(f"Current task success rate: {float(task_successes) / float(task_episodes)}")
