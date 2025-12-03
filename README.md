@@ -7,7 +7,8 @@
 # trying to download and prepare libero data.
 uv run scripts/compute_norm_stats.py --config-name pi05_libero
 
-
+# just do training:
+XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi05_libero --exp-name=1202_debug --overwrite
 
 
 ```
