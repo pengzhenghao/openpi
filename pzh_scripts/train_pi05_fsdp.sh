@@ -21,5 +21,5 @@ export XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
 
 
 # Run the training command without FSDP enabled (8 devices)
-uv run scripts/train.py pi05_libero --exp-name="1202_debug_no_fsdp_$(date +%Y%m%d_%H%M%S)" --fsdp-devices=1
+uv run scripts/train.py pi05_libero --exp-name="1202_debug_no_fsdp_$(date +%Y%m%d_%H%M%S)" --fsdp-devices=1 --log-interval=10
 
